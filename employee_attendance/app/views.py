@@ -6,6 +6,13 @@ from django.utils import timezone
 from decimal import Decimal  # Import Decimal
 
 
+from django.utils import timezone
+from decimal import Decimal
+from rest_framework.response import Response
+from rest_framework import status as http_status
+from rest_framework.views import APIView
+from .models import User, ClockEntry
+
 class ClockEntryAPIView(APIView):
     def post(self, request):
         pin = request.data.get('pin')
@@ -19,14 +26,19 @@ class ClockEntryAPIView(APIView):
         except User.DoesNotExist:
             return Response({'message': 'User not found'}, status=http_status.HTTP_404_NOT_FOUND)
 
+        response_data = {}  # Create a dictionary to hold response data
+
         if status == "true":
             # Clock in the user
             existing_clock_entry = ClockEntry.objects.filter(user=user, clock_out__isnull=True).first()
             if existing_clock_entry:
-                return Response({'message': 'User is already clocked in'}, status=http_status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{user.username} is already clocked in'}, status=http_status.HTTP_400_BAD_REQUEST)
             
-            ClockEntry.objects.create(user=user, clock_in=timezone.now())
-            return Response({'message': 'Clock in successful'}, status=http_status.HTTP_201_CREATED)
+            clock_entry = ClockEntry.objects.create(user=user, clock_in=timezone.now())
+            response_data['message'] = 'Clock in successful'
+            response_data['user'] = user.username
+            response_data['clock_in_time'] = clock_entry.clock_in
+            return Response(response_data, status=http_status.HTTP_201_CREATED)
         else:
             # Clock out the user
             try:
@@ -40,9 +52,15 @@ class ClockEntryAPIView(APIView):
                 hours_worked_decimal = Decimal(hours_worked)  # Convert to Decimal
                 last_clock_entry.wage = hourly_wage * hours_worked_decimal  # Perform multiplication
                 last_clock_entry.save()
-                return Response({'message': 'Clock out successful'}, status=http_status.HTTP_200_OK)
+                
+                response_data['message'] = 'Clock out successful'
+                response_data['user'] = user.username
+                response_data['clock_in_time'] = clock_in_time
+                response_data['clock_out_time'] = clock_out_time
+                return Response(response_data, status=http_status.HTTP_200_OK)
             except ClockEntry.DoesNotExist:
                 return Response({'message': 'Clock in before clocking out'}, status=http_status.HTTP_400_BAD_REQUEST)
+
             
 class UserListCreateAPIView(APIView):
     def get(self, request):
