@@ -21,6 +21,10 @@ class ClockEntryAPIView(APIView):
 
         if status:
             # Clock in the user
+            existing_clock_entry = ClockEntry.objects.filter(user=user, clock_out__isnull=True).first()
+            if existing_clock_entry:
+                return Response({'message': 'User is already clocked in'}, status=http_status.HTTP_400_BAD_REQUEST)
+            
             ClockEntry.objects.create(user=user, clock_in=timezone.now())
             return Response({'message': 'Clock in successful'}, status=http_status.HTTP_201_CREATED)
         else:
