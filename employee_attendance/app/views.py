@@ -19,7 +19,7 @@ class ClockEntryAPIView(APIView):
         except User.DoesNotExist:
             return Response({'message': 'User not found'}, status=http_status.HTTP_404_NOT_FOUND)
 
-        if status:
+        if status == "true":
             # Clock in the user
             existing_clock_entry = ClockEntry.objects.filter(user=user, clock_out__isnull=True).first()
             if existing_clock_entry:
