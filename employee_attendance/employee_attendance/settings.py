@@ -111,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Add your React frontend URL here
+    "http://15.164.26.127"
 ]
 
 
