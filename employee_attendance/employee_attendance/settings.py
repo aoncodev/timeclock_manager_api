@@ -25,19 +25,19 @@ SECRET_KEY = 'django-insecure-&_exjp$5i+q621&6*ex#^2rh29@rfcormf6_i!b@rbg$=u*a7!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['52.78.236.151', 'localhost']
+ALLOWED_HOSTS = ['52.78.236.151', '15.164.26.127','localhost']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'corsheaders',
     'app',
 ]
 
@@ -110,7 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Add your React frontend URL here
     "http://15.164.26.127"
 ]
 
